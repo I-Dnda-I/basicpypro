@@ -52,7 +52,16 @@ class App:
                 self.matrix_guide[i][j]=rnd.choices([2,4],weights=[0.75,0.25])[0]
                 self.matrix[i][j].config(bg="#00dddd", text=f"{self.matrix_guide[i][j]}")
                 break
-                
+    
+    def fusion_cells_to_r(self):
+        self.mov_cells_to_r()
+        for i in range(3,-1,-1):
+            for j in range(3,-1,-1):
+                if j+1<4 and self.matrix_guide[i][j+1]==self.matrix_guide[i][j]:
+                    self.matrix_guide[i][j+1]=self.matrix_guide[i][j+1]*2
+                    self.matrix_guide[i][j]=0
+        self.mov_cells_to_r()
+                    
     def mov_cells_to_r(self):
         for i in range(3,-1,-1):
             for j in range(3,-1,-1):
@@ -68,21 +77,6 @@ class App:
                         self.matrix_guide[i][j] = 0
                         break
                         
-                if j+1<4 and self.matrix_guide[i][j+1]==self.matrix_guide[i][j]:
-                    self.matrix_guide[i][j+1]=self.matrix_guide[i][j+1]*2
-                    self.matrix_guide[i][j]=0
-                
-                for k in range(j+1,4,1):
-                    if not (self.matrix_guide[i][k]==0):
-                        if k-1!= j:
-                            self.matrix_guide[i][k-1] = self.matrix_guide[i][j]
-                            self.matrix_guide[i][j] = 0
-                        break      
-                    
-                    if (k==3):
-                        self.matrix_guide[i][k] = self.matrix_guide[i][j]
-                        self.matrix_guide[i][j] = 0
-                        break
                         
                 
     def update_game(self):
@@ -100,12 +94,16 @@ class App:
                 self.matrix_guide[i][j]=0
         self.random_start()
     
-    def verify_full():
-        pass
+    def verify_full(self):
+        for i in range(4):
+            for j in range(4):
+                if (self.matrix_guide[i][j] == 0):
+                    return False
+        return True
     
     def event_r_arrow(self,event):
-        self.mov_cells_to_r()
-        if not self.verify_full():
+        self.fusion_cells_to_r() # to determine if there is no more movements available is a must to press right arrow
+        if self.verify_full():
             self.restart_state()
         else:
             self.random_mvmnt()
