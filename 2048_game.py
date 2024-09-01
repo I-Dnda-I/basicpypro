@@ -13,6 +13,8 @@ class App:
 
         self.root.bind("<Right>", self.event_r_arrow)
         self.root.bind("<Left>", self.event_l_arrow)
+        self.root.bind("<Up>", self.event_u_arrow)
+        self.root.bind("<Down>", self.event_d_arrow)
 
     def setup_start(self):
         for row in range(4):
@@ -20,6 +22,7 @@ class App:
                 cell = tk.Label(
                     root,
                     text="",
+                    font=("Helvetica", 25),
                     borderwidth=1,
                     relief="solid",
                     width=10,
@@ -75,19 +78,19 @@ class App:
 
     def fusion_cells_to_u(self):
         self.mov_cells_to_u()
-        for i in range(3, -1, -1):
+        for i in range(4):
             for j in range(3, -1, -1):
-                if j + 1 < 4 and self.matrix_guide[i][j + 1] == self.matrix_guide[i][j]:
-                    self.matrix_guide[i][j + 1] = self.matrix_guide[i][j + 1] * 2
-                    self.matrix_guide[i][j] = 0
+                if i + 1 < 4 and self.matrix_guide[i][j] == self.matrix_guide[i+1][j]:
+                    self.matrix_guide[i][j] = self.matrix_guide[i][j] * 2
+                    self.matrix_guide[i+1][j] = 0
         self.mov_cells_to_u()
 
     def fusion_cells_to_d(self):
         self.mov_cells_to_d()
         for i in range(3, -1, -1):
             for j in range(3, -1, -1):
-                if j + 1 < 4 and self.matrix_guide[i][j + 1] == self.matrix_guide[i][j]:
-                    self.matrix_guide[i][j + 1] = self.matrix_guide[i][j + 1] * 2
+                if i + 1 < 4 and self.matrix_guide[i+1][j] == self.matrix_guide[i][j]:
+                    self.matrix_guide[i+1][j] = self.matrix_guide[i+1][j] * 2
                     self.matrix_guide[i][j] = 0
         print(self.matrix_guide)
         self.mov_cells_to_d()
@@ -124,32 +127,32 @@ class App:
         print(f" moves : {self.matrix_guide}")
         
     def mov_cells_to_u(self):
-        for i in range(3, -1, -1):
+        for i in range(4):
             for j in range(3, -1, -1):
-                for k in range(j + 1, 4, 1):
-                    if not (self.matrix_guide[i][k] == 0):
-                        if k - 1 != j:
-                            self.matrix_guide[i][k - 1] = self.matrix_guide[i][j]
+                for k in range(i-1, -1, -1):
+                    if not (self.matrix_guide[k][j] == 0):
+                        if k + 1 != i:
+                            self.matrix_guide[k+1][j] = self.matrix_guide[i][j]
                             self.matrix_guide[i][j] = 0
                         break
 
-                    if k == 3:
-                        self.matrix_guide[i][k] = self.matrix_guide[i][j]
+                    if k == 0:
+                        self.matrix_guide[k][j] = self.matrix_guide[i][j]
                         self.matrix_guide[i][j] = 0
                         break
     
     def mov_cells_to_d(self):
         for i in range(3, -1, -1):
             for j in range(3, -1, -1):
-                for k in range(j + 1, 4, 1):
-                    if not (self.matrix_guide[i][k] == 0):
-                        if k - 1 != j:
-                            self.matrix_guide[i][k - 1] = self.matrix_guide[i][j]
+                for k in range(i + 1, 4, 1):
+                    if not (self.matrix_guide[k][j] == 0):
+                        if k - 1 != i:
+                            self.matrix_guide[k-1][j] = self.matrix_guide[i][j]
                             self.matrix_guide[i][j] = 0
                         break
 
                     if k == 3:
-                        self.matrix_guide[i][k] = self.matrix_guide[i][j]
+                        self.matrix_guide[k][j] = self.matrix_guide[i][j]
                         self.matrix_guide[i][j] = 0
                         break
                     
@@ -186,13 +189,26 @@ class App:
             self.update_game()
 
     def event_l_arrow(self, event):
-        self.fusion_cells_to_l()  # to determine if there is no more movements available is a must to press right arrow
+        self.fusion_cells_to_l()  
         if self.verify_full():
             self.restart_state()
         else:
             self.random_mvmnt()
             self.update_game()
-
+    def event_u_arrow(self, event):
+        self.fusion_cells_to_u()  
+        if self.verify_full():
+            self.restart_state()
+        else:
+            self.random_mvmnt()
+            self.update_game()
+    def event_d_arrow(self, event):
+        self.fusion_cells_to_d()  
+        if self.verify_full():
+            self.restart_state()
+        else:
+            self.random_mvmnt()
+            self.update_game()      
 if __name__ == "__main__":
     root = tk.Tk()
     game = App(root)
